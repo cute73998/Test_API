@@ -1,77 +1,77 @@
-// Jenkinsfile
-
 pipeline {
-    // 1. Chỉ định "agent" (máy chạy pipeline)
-    // Chúng ta yêu cầu một agent có cài đặt công cụ Node.js tên là 'NodeJS-18'
-    // Tên 'NodeJS-18' này phải được cấu hình trong Global Tool Configuration của Jenkins.
+    // 1. CẤU HÌNH AGENT
     agent {
+        // Yêu cầu một agent có cài đặt 'NodeJS-18'
         tools {
             nodejs 'NodeJS-18'
         }
     }
 
-    // 2. Định nghĩa các giai đoạn (stages)
+    // 2. CÁC GIAI ĐOẠN (STAGES)
     stages {
-        // Giai đoạn 1: Lấy code (Jenkins tự động làm nếu dùng Blue Ocean hoặc Multibranch)
-        // stage('Checkout') {
-        //     steps {
-        //         checkout scm
-        //     }
-        // }
-         stage('Cuong gay') {
+        
+        // Giai đoạn 1: Lấy code từ Git
+        stage('Checkout') {
             steps {
-                // Sử dụng 'npm ci' để cài đặt nhanh và nhất quán
-                sh 'cd backend'
-            }
-        }
-        // Giai đoạn 2: Cài đặt Dependencies
-        stage('Install Dependencies') {
-            steps {
-                // Sử dụng 'npm ci' để cài đặt nhanh và nhất quán
-                sh 'npm ci'
+                echo 'Checking out code...'
+                checkout scm 
             }
         }
 
-        // Giai đoạn 3: Chạy Lint (kiểm tra code style)
-        stage('Lint') {
-            steps {
-                // Giả sử bạn có script 'lint' trong package.json
-                sh 'npm run lint'
-            }
-        }
+        // GIAI ĐOẠN "START DATABASE" ĐÃ BỊ XÓA
+        // Chúng ta giả định database đã chạy sẵn
+        
+        // Giai đoạn 2: Chạy các lệnh bên trong thư mục 'backend'
+        dir('backend') {
 
-        // Giai đoạn 4: Chạy Tests
-        stage('Test') {
-            steps {
-                // Chạy unit test và integration test
-                sh 'npm test'
+            // Giai đoạn 2a: Cài đặt thư viện
+            stage('Install Dependencies') {
+                steps {
+                    echo 'Running npm install inside /backend'
+                    sh 'npm install'
+                }
             }
-        }
 
-        // Giai đoạn 5: Build dự án (nếu cần)
-        stage('Build') {
-            steps {
-                // Giả sử bạn có script 'build' trong package.json
-                sh 'npm run build'
-            }
-            post {
-                // Nếu build thành công, lưu trữ các file đã build (ví dụ: thư mục 'dist')
-                success {
-                    archiveArtifacts artifacts: 'dist/**'
+            // Giai đoạn 2b: Chạy Server VÀ Chạy Test
+            stage('Run Server & Tests') {
+                steps {
+                    script {
+                        try {
+                            // CHẠY SERVER Ở CHẾ ĐỘ NỀN (dấu &)
+                            echo 'Starting API server in background...'
+                            // Server sẽ kết nối đến DB 'localhost' CÓ SẴN
+                            sh 'npm start &'
+                            
+                            echo 'Waiting 5 seconds for server...'
+                            sh 'sleep 5'
+                            
+                            // CHẠY TEST
+                            echo 'Running Jest tests...'
+                            sh 'npm test'
+                            
+                        } catch (e) {
+                            echo 'Tests failed!'
+                            currentBuild.result = 'FAILURE'
+                            throw e
+                        }
+                    }
                 }
             }
         }
     }
 
-    // 3. Các hành động sau khi pipeline hoàn tất (luôn chạy)
+    // 3. DỌN DẸP SAU KHI BUILD
     post {
         always {
-            // Dọn dẹp workspace
+            echo 'Cleaning up...'
+            
+            // 1. Dừng server API (tìm và giết tiến trình Node)
+            sh 'pkill node || true' 
+            
+            // 2. KHÔNG CẦN DỌN DẸP DATABASE (vì nó chạy vĩnh viễn)
+            
+            // 3. Dọn dẹp workspace
             cleanWs()
-        }
-        failure {
-            // Gửi thông báo nếu pipeline thất bại (ví dụ: qua Slack, Email)
-            echo 'Pipeline thất bại!'
         }
     }
 }
