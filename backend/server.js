@@ -9,7 +9,7 @@ app.use(express.json());
 // Lấy toàn bộ sinh viên
 app.get('/students', (req, res) => {
     db.query('SELECT * FROM students', (err, results) => {
-        console.log('Query executed: SELECT * FROM students');
+        console.log('Query executed: SELECT * FROM students2');
         if (err) return res.status(500).json({ error: err.message });
         res.json(results);
     });
