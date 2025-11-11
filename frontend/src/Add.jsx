@@ -12,37 +12,12 @@ export default function Add() {
 
     // Trong file Add.jsx
 
-    function handleAdd() {
-        // --- BẮT ĐẦU PHẦN KIỂM TRA ---
+   async function handleAdd() {
+    // ... (Toàn bộ phần kiểm tra Regex của bạn giữ nguyên) ...
 
-        // 1. Định nghĩa Regex (Biểu thức chính quy)
-        // Regex cho email
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-        // Regex cho SĐT Việt Nam (10 số, bắt đầu bằng 0)
-        const phoneRegex = /^0\d{9}$/;
-
-        // 2. Kiểm tra các trường (Thêm kiểm tra rỗng)
-        if (!name || !age || !email || !phone || !address || !gender) {
-            alert('Vui lòng điền đầy đủ thông tin.');
-            return; // Dừng hàm
-        }
-
-        // 3. Kiểm tra Email
-        if (!emailRegex.test(email)) {
-            alert('Email không đúng định dạng. Vui lòng kiểm tra lại.');
-            return; // Dừng hàm
-        }
-
-        // 4. Kiểm tra Phone
-        if (!phoneRegex.test(phone)) {
-            alert('Số điện thoại không đúng định dạng. (Phải là 10 số, bắt đầu bằng 0).');
-            return; // Dừng hàm
-        }
-
-        // --- KẾT THÚC PHẦN KIỂM TRA ---
-
-        // Nếu tất cả kiểm tra đều qua, hàm fetch sẽ được gọi
-        fetch(`http://localhost:9999/students`, {
+    // --- SỬA LẠI PHẦN FETCH ---
+    try {
+        const res = await fetch(`http://localhost:9999/students`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -50,11 +25,22 @@ export default function Add() {
             body: JSON.stringify({
                 name, age, email, phone, address, gender
             })
-        }).then(() => {
+        });
+
+        if (res.ok) { // Nếu server trả về 200 (OK)
             alert('Thêm thành công!');
             navigate('/');
-        })
-    };
+        } else {
+            // Nếu server trả về lỗi (ví dụ 500)
+            const errorData = await res.json();
+            alert('Thêm thất bại! Lỗi: ' + (errorData.error || 'Lỗi không xác định'));
+        }
+
+    } catch (err) {
+        // Lỗi này xảy ra nếu không thể kết nối (server sập)
+        alert('Không thể kết nối đến server!');
+    }
+};
 
     return (
         <div className="container">
