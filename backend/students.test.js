@@ -20,7 +20,7 @@ describe('Integration Test cho API /students', () => {
                 address: "TP. Jest" //test commit
             });
         
-        expect(response.statusCode).toBe(200);
+        expect(response.statusCode).toBe(201); //Sửa thành 201 để gây lỗi
         expect(response.body).toHaveProperty('id');
         newStudentId = response.body.id; // Lưu lại ID
     });
