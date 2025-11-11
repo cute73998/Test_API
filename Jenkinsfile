@@ -1,5 +1,4 @@
 pipeline {
-    // SỬA 1: 'agent' và 'tools' là 2 khối riêng biệt
     agent any 
     
     tools {
@@ -14,32 +13,32 @@ pipeline {
             }
         }
         
-        // Giai đoạn 2a: Cài đặt thư viện
         stage('Install Dependencies') {
             steps {
-                // SỬA 2: Đặt 'dir' bên trong 'steps'
                 dir('backend') {
                     echo 'Running npm install inside /backend'
-                    sh 'npm install'
+                    // SỬA: Dùng 'bat' cho Windows
+                    bat 'npm install'
                 }
             }
         }
 
-        // Giai đoạn 2b: Chạy Server VÀ Chạy Test
         stage('Run Server & Tests') {
             steps {
-                // SỬA 2: Đặt 'dir' bên trong 'steps'
                 dir('backend') {
                     script {
                         try {
                             echo 'Starting API server in background...'
-                            sh 'npm start &'
+                            // SỬA: Dùng 'bat' và 'start' của Windows
+                            bat 'start "API Server" npm start'
                             
                             echo 'Waiting 5 seconds for server...'
+                            // 'sleep' vẫn hoạt động
                             sh 'sleep 5'
                             
                             echo 'Running Jest tests...'
-                            sh 'npm test'
+                            // SỬA: Dùng 'bat'
+                            bat 'npm test'
                             
                         } catch (e) {
                             echo 'Tests failed!'
@@ -55,7 +54,9 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            sh 'pkill node || true' 
+            // SỬA: Dùng 'bat' và 'taskkill' của Windows
+            bat 'taskkill /F /IM node.exe || echo process not found'
+            
             cleanWs()
         }
     }
