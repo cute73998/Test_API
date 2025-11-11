@@ -17,7 +17,6 @@ pipeline {
             steps {
                 dir('backend') {
                     echo 'Running npm install inside /backend'
-                    // SỬA: Dùng 'bat' cho Windows
                     bat 'npm install'
                 }
             }
@@ -29,15 +28,13 @@ pipeline {
                     script {
                         try {
                             echo 'Starting API server in background...'
-                            // SỬA: Dùng 'bat' và 'start' của Windows
                             bat 'start "API Server" npm start'
                             
                             echo 'Waiting 5 seconds for server...'
-                            // 'sleep' vẫn hoạt động
-                            sh 'sleep 5'
+                            // SỬA LỖI Ở ĐÂY: Dùng 'bat' và 'timeout'
+                            bat 'timeout /t 5 /nobreak'
                             
                             echo 'Running Jest tests...'
-                            // SỬA: Dùng 'bat'
                             bat 'npm test'
                             
                         } catch (e) {
@@ -54,9 +51,7 @@ pipeline {
     post {
         always {
             echo 'Cleaning up...'
-            // SỬA: Dùng 'bat' và 'taskkill' của Windows
             bat 'taskkill /F /IM node.exe || echo process not found'
-            
             cleanWs()
         }
     }
