@@ -31,8 +31,8 @@ pipeline {
                             bat 'start "API Server" npm start'
                             
                             echo 'Waiting 5 seconds for server...'
-                            // SỬA LỖI Ở ĐÂY: Dùng 'bat' và 'timeout'
-                            bat 'timeout /t 5 /nobreak'
+                            // SỬA LỖI Ở ĐÂY: Dùng lệnh 'sleep' native của Jenkins
+                            sleep 5
                             
                             echo 'Running Jest tests...'
                             bat 'npm test'
