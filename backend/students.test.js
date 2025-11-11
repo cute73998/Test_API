@@ -17,7 +17,7 @@ describe('Integration Test cho API /students', () => {
                 gender: "Nam",
                 email: `jest${Date.now()}@gmail.com`, // Email duy nhất
                 phone: "0123456789",
-                address: "TP. Jest"
+                address: "TP. Jest" //test commit
             });
         
         expect(response.statusCode).toBe(200);
