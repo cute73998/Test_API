@@ -40,7 +40,7 @@ pipeline {
                             echo 'Waiting 5 seconds for server to start...'
                             sleep 5
                             
-                            echo 'Running Jest tests...'
+                            echo 'Running Jest tests..2.'
                             bat 'npm test'
                             
                         } catch (e) {
