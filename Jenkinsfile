@@ -1,5 +1,5 @@
 pipeline {
-    agent any // Tìm bất kỳ agent đang sẵn có
+    agent any // Tìm bất kỳ agent đang sẵn có 1234
     
     tools {
         nodejs 'NodeJS-18'
