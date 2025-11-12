@@ -12,7 +12,14 @@ pipeline {
                 checkout scm 
             }
         }
-        
+          stage('test nodejs') {
+            steps {
+                dir('backend') {
+                    echo 'Running print path variable'
+                    bat 'echo %PATH%'
+                }
+            }
+        }
         stage('Install Dependencies') {
             steps {
                 dir('backend') {
